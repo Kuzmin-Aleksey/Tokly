@@ -30,6 +30,9 @@ func RequestLogging(
 			}
 
 			dump, err := httputil.DumpRequest(r, dumpBody)
+			if err != nil {
+				logger(ctx).Error("Failed to dump http request", logx.Error(err))
+			}
 
 			if len(dump) > logFieldMaxLen {
 				dump = dump[:logFieldMaxLen]
@@ -38,7 +41,6 @@ func RequestLogging(
 			logger(ctx).Info(
 				logx.FieldHTTPRequest,
 				slog.String(logx.FieldRequestBody, string(sensitiveDataMasker.Mask(dump))),
-				logx.Error(err),
 			)
 
 			next.ServeHTTP(w, r)
