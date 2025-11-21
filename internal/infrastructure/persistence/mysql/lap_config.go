@@ -20,7 +20,7 @@ func NewLapConfigRepo(db *sqlx.DB) *LapConfigRepo {
 	}
 }
 
-func (r *LapConfigRepo) SaveParameter(ctx context.Context, lapId int, params entity.LapParameter) error {
+func (r *LapConfigRepo) SaveParameter(ctx context.Context, lapId string, params entity.LapParameter) error {
 	const op = "LapConfigRepo.AddParameter"
 
 	query := `
@@ -34,7 +34,7 @@ ON DUPLICATE KEY UPDATE value=?`
 	return nil
 }
 
-func (r *LapConfigRepo) DeleteParameters(ctx context.Context, lapId int, classes []string) error {
+func (r *LapConfigRepo) DeleteParameters(ctx context.Context, lapId string, classes []string) error {
 	const op = "LapConfigRepo.DeleteParameters"
 
 	placeHolders := strings.TrimSuffix(strings.Repeat("?,", len(classes)), ",")
@@ -55,7 +55,7 @@ func (r *LapConfigRepo) DeleteParameters(ctx context.Context, lapId int, classes
 	return nil
 }
 
-func (r *LapConfigRepo) UpdateParameter(ctx context.Context, lapId int, param entity.LapParameter) error {
+func (r *LapConfigRepo) UpdateParameter(ctx context.Context, lapId string, param entity.LapParameter) error {
 	const op = "LapConfigRepo.UpdateParameters"
 	if _, err := r.db.ExecContext(ctx, "UPDATE lap_config SET value=? WHERE lap_id=? AND class=?", param.Value, lapId, param.Class); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
@@ -63,7 +63,7 @@ func (r *LapConfigRepo) UpdateParameter(ctx context.Context, lapId int, param en
 	return nil
 }
 
-func (r *LapConfigRepo) GetLapParameters(ctx context.Context, lapId int) ([]entity.LapParameter, error) {
+func (r *LapConfigRepo) GetLapParameters(ctx context.Context, lapId string) ([]entity.LapParameter, error) {
 	const op = "LapConfigRepo.GetConfig"
 
 	var params []entity.LapParameter

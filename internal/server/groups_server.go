@@ -20,11 +20,7 @@ func NewGroupsServer(groups *groups.Service) *GroupsServer {
 func (s *GroupsServer) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	lapId, err := strconv.Atoi(r.FormValue("lap_id"))
-	if err != nil {
-		writeAndLogErr(ctx, w, failure.NewInvalidRequestError("invalid lap_id"))
-		return
-	}
+	lapId := r.FormValue("lap_id")
 
 	id, err := s.groups.CreateGroup(ctx, lapId)
 	if err != nil {
@@ -38,11 +34,7 @@ func (s *GroupsServer) CreateGroup(w http.ResponseWriter, r *http.Request) {
 func (s *GroupsServer) GetByLap(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	lapId, err := strconv.Atoi(r.FormValue("lap_id"))
-	if err != nil {
-		writeAndLogErr(ctx, w, failure.NewInvalidRequestError("invalid lap_id"))
-		return
-	}
+	lapId := r.FormValue("lap_id")
 
 	g, err := s.groups.GetByLap(ctx, lapId)
 	if err != nil {

@@ -3,6 +3,7 @@ package mysql
 import (
 	"FairLAP/internal/domain/aggregate"
 	"FairLAP/internal/domain/entity"
+	"FairLAP/pkg/failure"
 	"context"
 	"database/sql"
 	"errors"
@@ -38,7 +39,7 @@ func (r *GroupsRepo) Save(ctx context.Context, group *entity.Group) error {
 	return nil
 }
 
-func (r *GroupsRepo) GetByLap(ctx context.Context, lapId int) ([]entity.Group, error) {
+func (r *GroupsRepo) GetByLap(ctx context.Context, lapId string) ([]entity.Group, error) {
 	const op = "DetectionsRepo.GetByLap"
 	var groups []entity.Group
 	if err := r.db.SelectContext(ctx, &groups, "SELECT * FROM `groups` WHERE lap_id=?", lapId); err != nil {
@@ -56,6 +57,18 @@ func (r *GroupsRepo) GetLaps(ctx context.Context) ([]aggregate.LapLastDetect, er
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
+	}
+	return laps, nil
+}
+
+func (r *GroupsRepo) GetLapId(ctx context.Context, groupId int) (string, error) {
+	const op = "DetectionsRepo.GetLaps"
+	var laps string
+	if err := r.db.GetContext(ctx, &laps, "SELECT lap_id FROM `groups` WHERE id=?", groupId); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", fmt.Errorf("%s: %w", op, failure.NewNotFoundError(err.Error()))
+		}
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 	return laps, nil
 }

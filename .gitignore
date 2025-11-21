@@ -4,3 +4,5 @@ logs
 *.jpeg
 *.png
 test
+main.go
+*.json

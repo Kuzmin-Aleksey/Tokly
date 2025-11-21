@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"image"
 	"image/jpeg"
-	"image/png"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -54,14 +54,14 @@ func (images *Images) Save(groupId int, img image.Image) (uuid.UUID, error) {
 	return uid, nil
 }
 
-func (images *Images) SaveMask(groupId int, uid uuid.UUID, maskId int, mask image.Image) error {
+func (images *Images) SaveMask(groupId int, uid uuid.UUID, mask io.Reader) error {
 	path := filepath.Join(images.path, strconv.Itoa(groupId))
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		if !os.IsExist(err) {
 			return fmt.Errorf("make dir failed: %w", err)
 		}
 	}
-	path = filepath.Join(path, fmt.Sprintf("%s_%d.png", uid, maskId))
+	path = filepath.Join(path, fmt.Sprintf("%s_mask.png", uid))
 
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
 	if err != nil {
@@ -69,8 +69,8 @@ func (images *Images) SaveMask(groupId int, uid uuid.UUID, maskId int, mask imag
 	}
 	defer f.Close()
 
-	if err := png.Encode(f, mask); err != nil {
-		return err
+	if _, err := io.Copy(f, mask); err != nil {
+		return fmt.Errorf("write file failed: %w", err)
 	}
 
 	return nil
@@ -90,8 +90,8 @@ func (images *Images) Open(groupId int, uid uuid.UUID) (*os.File, error) {
 	return f, nil
 }
 
-func (images *Images) OpenMask(groupId int, uid uuid.UUID, maskId int) (*os.File, error) {
-	path := filepath.Join(images.path, strconv.Itoa(groupId), fmt.Sprintf("%s_%d.png", uid, maskId))
+func (images *Images) OpenMask(groupId int, uid uuid.UUID) (*os.File, error) {
+	path := filepath.Join(images.path, strconv.Itoa(groupId), fmt.Sprintf("%s_mask.png", uid))
 
 	f, err := os.OpenFile(path, os.O_RDONLY, os.ModePerm)
 	if err != nil {

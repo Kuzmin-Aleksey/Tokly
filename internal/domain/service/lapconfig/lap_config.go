@@ -8,9 +8,9 @@ import (
 )
 
 type Repo interface {
-	SaveParameter(ctx context.Context, lapId int, params entity.LapParameter) error
-	GetLapParameters(ctx context.Context, lapId int) ([]entity.LapParameter, error)
-	DeleteParameters(ctx context.Context, lapId int, classes []string) error
+	SaveParameter(ctx context.Context, lapId string, params entity.LapParameter) error
+	GetLapParameters(ctx context.Context, lapId string) ([]entity.LapParameter, error)
+	DeleteParameters(ctx context.Context, lapId string, classes []string) error
 }
 
 type Service struct {
@@ -25,7 +25,7 @@ func NewService(repo Repo, defaultConfig map[string]int) *Service {
 	}
 }
 
-func (s *Service) SaveDefaultConfig(ctx context.Context, lapId int) error {
+func (s *Service) SaveDefaultConfig(ctx context.Context, lapId string) error {
 	const op = "lap_config.SaveDefaultConfig"
 
 	for class, val := range s.defaultConfig {
@@ -42,7 +42,7 @@ func (s *Service) SaveDefaultConfig(ctx context.Context, lapId int) error {
 	return nil
 }
 
-func (s *Service) SaveLapConfig(ctx context.Context, lapId int, params map[string]int) error {
+func (s *Service) SaveLapConfig(ctx context.Context, lapId string, params map[string]int) error {
 	const op = "lap_config.SaveLapConfig"
 
 	currentParams, isDefault, err := s.getConfig(ctx, lapId)
@@ -83,7 +83,7 @@ func (s *Service) SaveLapConfig(ctx context.Context, lapId int, params map[strin
 	return nil
 }
 
-func (s *Service) getConfig(ctx context.Context, lapId int) (map[string]int, bool, error) {
+func (s *Service) getConfig(ctx context.Context, lapId string) (map[string]int, bool, error) {
 	const op = "lap_config.getConfig"
 	lapParameters, err := s.repo.GetLapParameters(ctx, lapId)
 	if err != nil {
@@ -103,7 +103,7 @@ func (s *Service) getConfig(ctx context.Context, lapId int) (map[string]int, boo
 	return mapParams, false, nil
 }
 
-func (s *Service) GetConfig(ctx context.Context, lapId int) (map[string]int, error) {
+func (s *Service) GetConfig(ctx context.Context, lapId string) (map[string]int, error) {
 	const op = "lap_config.GetConfig"
 	cfg, _, err := s.getConfig(ctx, lapId)
 	if err != nil {

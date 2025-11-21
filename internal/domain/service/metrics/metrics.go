@@ -15,10 +15,11 @@ type DetectionsRepo interface {
 
 type GroupsRepo interface {
 	GetLaps(ctx context.Context) ([]aggregate.LapLastDetect, error)
+	GetLapId(ctx context.Context, groupId int) (string, error)
 }
 
 type ConfigService interface {
-	GetConfig(ctx context.Context, lapId int) (map[string]int, error)
+	GetConfig(ctx context.Context, lapId string) (map[string]int, error)
 }
 
 type Service struct {
@@ -41,7 +42,7 @@ type LapItem struct {
 	LastDetect   time.Time `json:"last_detect"`
 }
 
-func (s *Service) GetLaps(ctx context.Context) (map[int]LapItem, error) {
+func (s *Service) GetLaps(ctx context.Context) (map[string]LapItem, error) {
 	const op = "metrics_service.GetLaps"
 
 	laps, err := s.groups.GetLaps(ctx)
@@ -49,7 +50,7 @@ func (s *Service) GetLaps(ctx context.Context) (map[int]LapItem, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	lapMap := make(map[int]LapItem)
+	lapMap := make(map[string]LapItem)
 
 	for _, lap := range laps {
 		lapItem := LapItem{
@@ -136,7 +137,12 @@ type ImageDetection struct {
 func (s *Service) GetGroupMetricV2(ctx context.Context, groupId int) (*GroupMetricV2, error) {
 	const op = "metrics_service.GetGroupMetric"
 
-	config, err := s.lapConfig.GetConfig(ctx, groupId)
+	lapId, err := s.groups.GetLapId(ctx, groupId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	config, err := s.lapConfig.GetConfig(ctx, lapId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

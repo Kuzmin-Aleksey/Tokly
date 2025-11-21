@@ -30,7 +30,7 @@ func (s *MaskServer) GetMask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rect, err := s.service.GetMask(ctx, detectionId)
+	rect, err := s.service.GetRectMask(ctx, detectionId)
 	if err != nil {
 		writeAndLogErr(ctx, w, err)
 		return

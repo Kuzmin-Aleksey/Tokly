@@ -5,7 +5,6 @@ import (
 	"FairLAP/pkg/failure"
 	"encoding/json"
 	"net/http"
-	"strconv"
 )
 
 type LapConfigServer struct {
@@ -21,11 +20,7 @@ func NewLapConfigServer(service *lapconfig.Service) *LapConfigServer {
 func (s *LapConfigServer) SaveLapConfig(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	lapId, err := strconv.Atoi(r.FormValue("lap_id"))
-	if err != nil {
-		writeAndLogErr(ctx, w, failure.NewInvalidRequestError("invalid lap_id"))
-		return
-	}
+	lapId := r.FormValue("lap_id")
 
 	config := make(map[string]int)
 	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
@@ -40,11 +35,7 @@ func (s *LapConfigServer) SaveLapConfig(w http.ResponseWriter, r *http.Request) 
 }
 func (s *LapConfigServer) GetLapConfig(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	lapId, err := strconv.Atoi(r.FormValue("lap_id"))
-	if err != nil {
-		writeAndLogErr(ctx, w, failure.NewInvalidRequestError("invalid lap_id"))
-		return
-	}
+	lapId := r.FormValue("lap_id")
 
 	cfg, err := s.service.GetConfig(ctx, lapId)
 	if err != nil {

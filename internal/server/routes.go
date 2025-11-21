@@ -19,5 +19,6 @@ func (s *Server) InitRoutes(rtr *mux.Router) {
 	rtr.HandleFunc("/lap_config/save", s.lapConfig.SaveLapConfig).Methods(http.MethodPost)
 
 	rtr.HandleFunc("/image/{group_id}/{image_uid}.jpeg", s.images.HandleImage).Methods(http.MethodGet)
+	rtr.HandleFunc("/image/{group_id}/{image_uid}_mask.png", s.images.HandleMask).Methods(http.MethodGet, http.MethodPost)
 	rtr.HandleFunc("/mask/{detection_id}.png", s.mask.GetMask).Methods(http.MethodGet)
 }
