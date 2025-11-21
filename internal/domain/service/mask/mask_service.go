@@ -6,29 +6,32 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"image"
-	"image/color"
-	"image/draw"
 )
 
-type Repo interface {
+type RectRepo interface {
 	GetRect(ctx context.Context, detectionId int) (*entity.RectDetection, string, error)
+}
+
+type PolygonRepo interface {
 	GetPolygons(ctx context.Context, imageUid uuid.UUID) (*entity.Polygons, error)
 }
 
 type Service struct {
-	repo Repo
+	rectRepo    RectRepo
+	polygonRepo PolygonRepo
 }
 
-func NewService(repo Repo) *Service {
+func NewService(rectRepo RectRepo, polygonRepo PolygonRepo) *Service {
 	return &Service{
-		repo: repo,
+		rectRepo:    rectRepo,
+		polygonRepo: polygonRepo,
 	}
 }
 
 func (s *Service) GetRectMask(ctx context.Context, detectionId int) (image.Image, error) {
 	const op = "service.GetRectMask"
 
-	rectDetection, class, err := s.repo.GetRect(ctx, detectionId)
+	rectDetection, class, err := s.rectRepo.GetRect(ctx, detectionId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -42,27 +45,13 @@ func (s *Service) GetRectMask(ctx context.Context, detectionId int) (image.Image
 func (s *Service) GetPolygonMask(ctx context.Context, imageUid uuid.UUID) (image.Image, error) {
 	const op = "service.GetPolygonMask"
 
-	p, err := s.repo.GetPolygons(ctx, imageUid)
+	p, err := s.polygonRepo.GetPolygons(ctx, imageUid)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	mask := image.NewRGBA(p.ImgBounds())
+	drawPolygon(mask, p.Data)
 
 	return mask, nil
-}
-
-func drawRect(img draw.Image, c color.Color, r image.Rectangle, thickness int) {
-	for j := range thickness {
-		for i := r.Min.X; i <= r.Max.X; i++ {
-			img.Set(i, r.Min.Y+j, c)
-			img.Set(i, r.Max.Y+j, c)
-		}
-	}
-	for j := range thickness {
-		for i := r.Min.Y; i <= r.Max.Y; i++ {
-			img.Set(r.Min.X+j, i, c)
-			img.Set(r.Max.X+j, i, c)
-		}
-	}
 }

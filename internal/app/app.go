@@ -59,7 +59,7 @@ func Run(cfg *config.Config) {
 	groupsService := groups.NewService(groupsRepo, imagesRepo)
 	lapConfigService := lapconfig.NewService(lapConfigRepo, cfg.DefaultLapConfig)
 	metricsService := metrics.NewService(groupsRepo, detectionsRepo, lapConfigService)
-	maskService := mask.NewService(detectionsRepo)
+	maskService := mask.NewService(detectionsRepo, nil)
 
 	httpServer := newHttpServer(l, detectorService, groupsService, metricsService, lapConfigService, maskService, imagesRepo, cfg.Http)
 

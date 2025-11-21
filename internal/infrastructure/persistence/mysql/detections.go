@@ -6,10 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/twpayne/go-geom"
-	"github.com/twpayne/go-geom/encoding/wkb"
 	"strings"
 )
 
@@ -94,45 +91,4 @@ func (r *DetectionsRepo) GetRect(ctx context.Context, detectionId int) (*entity.
 	}
 
 	return &rect, class, nil
-}
-
-func (r *DetectionsRepo) SavePolygons(ctx context.Context, p *entity.Polygons) error {
-	const op = "DetectionsRepo.SavePolygons"
-
-	wkbBytes, err := wkb.Marshal(p.Data, wkb.NDR)
-	if err != nil {
-		return err
-	}
-
-	if _, err := r.db.ExecContext(ctx, "INSERT INTO polygons (image_uid, width, height, poligons) VALUES (?, ST_GeomFromWKB(?))", p.ImageUid, p.Width, p.Height, wkbBytes); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
-
-	return nil
-}
-
-func (r *DetectionsRepo) GetPolygons(ctx context.Context, imageUid uuid.UUID) (*entity.Polygons, error) {
-	const op = "DetectionsRepo.GetPolygons"
-
-	var p entity.Polygons
-	var wkbBytes []byte
-
-	err := r.db.QueryRowContext(ctx, "SELECT * FROM polygons WHERE image_uid=?", imageUid).Scan(&p.Id, &p.ImageUid, &p.Width, p.Height, &wkbBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	geometry, err := wkb.Unmarshal(wkbBytes)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
-	}
-
-	multipolygon, ok := geometry.(*geom.MultiPolygon)
-	if !ok {
-		return nil, fmt.Errorf("%s: expected MultiPolygon, got %T", op, geometry)
-	}
-
-	p.Data = multipolygon
-
-	return &p, nil
 }

@@ -52,3 +52,18 @@ func drawRectMask(dst draw.Image, class string, rectDetection *entity.RectDetect
 	drawer.Dot = fixed.P(x, y)
 	drawer.DrawString(lbl)
 }
+
+func drawRect(img draw.Image, c color.Color, r image.Rectangle, thickness int) {
+	for j := range thickness {
+		for i := r.Min.X; i <= r.Max.X; i++ {
+			img.Set(i, r.Min.Y+j, c)
+			img.Set(i, r.Max.Y+j, c)
+		}
+	}
+	for j := range thickness {
+		for i := r.Min.Y; i <= r.Max.Y; i++ {
+			img.Set(r.Min.X+j, i, c)
+			img.Set(r.Max.X+j, i, c)
+		}
+	}
+}
