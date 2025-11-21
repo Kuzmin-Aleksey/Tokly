@@ -10,8 +10,6 @@ import (
 
 type ModelConfig struct {
 	ClassList     []string `yaml:"class-list" json:"class-list"`
-	Input         string   `yaml:"input" json:"input"`
-	Output        string   `yaml:"output" json:"output"`
 	Size          Size     `yaml:"size" json:"size"`
 	ConfThreshold float32  `yaml:"conf-threshold" json:"conf-threshold"`
 	NMSThreshold  float32  `yaml:"NMS-threshold" json:"NMS-threshold"`
@@ -69,8 +67,8 @@ func (m *Model) Detect(img image.Image) ([]Detection, error) {
 	blob := gocv.BlobFromImage(mat, 1.0/255.0, image.Pt(m.cfg.Size.Width, m.cfg.Size.Height), gocv.NewScalar(0, 0, 0, 0), true, false)
 	defer blob.Close()
 
-	m.net.SetInput(blob, m.cfg.Input)
-	output := m.net.Forward(m.cfg.Output)
+	m.net.SetInput(blob, "images")
+	output := m.net.Forward("output0")
 	defer output.Close()
 
 	detections, err := m.processYOLOv8Output(output, mat.Cols(), mat.Rows())

@@ -35,8 +35,10 @@ type MySQLConfig struct {
 }
 
 type YoloModelConfig struct {
-	Model       string `json:"model" yaml:"model" env:"YOLO_MODEL"`
-	ModelConfig string `json:"model_config" yaml:"model_config" env:"YOLO_MODEL_CONFIG"`
+	Model          string `json:"model" yaml:"model" env:"YOLO_MODEL"`
+	ModelConfig    string `json:"model_config" yaml:"model_config" env:"YOLO_MODEL_CONFIG"`
+	ModelSeg       string `json:"model_seg" yaml:"model_seg" env:"YOLO_MODEL_SEG"`
+	ModelSegConfig string `json:"model_seg_config" yaml:"model_seg_config" env:"YOLO_MODEL_SEG_CONFIG"`
 }
 
 func ReadConfig(path string, dotenv ...string) (*Config, error) {

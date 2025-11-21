@@ -39,8 +39,10 @@ mysql:
 
 
 yolo_model:
-  model: "/model/best.onnx"
+  model: "/model/model.onnx"
   model_config: "/model/config.yaml"
+  model-seg: "/model/model-seg.onnx"
+  model-model_seg_config: "/model/config_seg.onnx"
 
 
 default_lap_config:
@@ -73,12 +75,20 @@ class-list:
   - damaged_insulator
   - polymer_insulators
 
-input: images
-output: output0
 size:
-  width: 864
-  height: 864
+  width: 640
+  height: 640
 
 conf-threshold: 0.5
 NMS-threshold: 0.5
+```
+
+### Example segmentation model config.yaml
+```yaml
+size:
+  width: 640
+  height: 640
+
+conf-threshold: 0.5
+NMS-threshold: 0.7
 ```

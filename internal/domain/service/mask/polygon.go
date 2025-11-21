@@ -24,9 +24,11 @@ func drawPolygon(dst draw.Image, polygons [][]image.Point) {
 			continue
 		}
 
-		ctx.MoveTo(float64(polygon[0].X), float64(polygon[0].X))
+		ctx.MoveTo(float64(polygon[0].X), float64(polygon[0].Y))
 
-		for _, coord := range polygon[1:] {
+		polygon = append(polygon, polygon[0])[1:]
+
+		for _, coord := range polygon {
 			ctx.LineTo(float64(coord.X), float64(coord.Y))
 		}
 

@@ -50,13 +50,18 @@ func (s *MaskServer) GetPolygon(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
+	groupId, err := strconv.Atoi(vars["group_id"])
+	if err != nil {
+		writeAndLogErr(ctx, w, failure.NewInvalidRequestError("invalid group_id"))
+	}
+
 	imageUid, err := uuid.Parse(vars["image_uid"])
 	if err != nil {
 		writeAndLogErr(ctx, w, failure.NewInvalidRequestError("invalid image_uid"))
 		return
 	}
 
-	polygon, err := s.service.GetPolygonMask(ctx, imageUid)
+	polygon, err := s.service.GetPolygonMask(ctx, groupId, imageUid)
 	if err != nil {
 		writeAndLogErr(ctx, w, err)
 		return

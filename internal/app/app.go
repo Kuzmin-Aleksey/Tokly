@@ -52,14 +52,21 @@ func Run(cfg *config.Config) {
 		log.Fatal("read yolo model config error: ", err)
 	}
 
+	yoloCegConfig, err := yolo_model.ReadSegConfig(cfg.YoloModel.ModelSegConfig)
+	if err != nil {
+		log.Fatal("read yolo model seg config error: ", err)
+	}
+
 	yoloModel := yolo_model.NewModel(cfg.YoloModel.Model, yoloConfig)
 	defer yoloModel.Close()
+
+	yoloModelSeg := yolo_model.NewModelSeg(cfg.YoloModel.ModelSeg, yoloCegConfig)
 
 	detectorService := detector.NewService(yoloModel, detectionsRepo, imagesRepo)
 	groupsService := groups.NewService(groupsRepo, imagesRepo)
 	lapConfigService := lapconfig.NewService(lapConfigRepo, cfg.DefaultLapConfig)
 	metricsService := metrics.NewService(groupsRepo, detectionsRepo, lapConfigService)
-	maskService := mask.NewService(detectionsRepo, nil)
+	maskService := mask.NewService(detectionsRepo, yoloModelSeg, imagesRepo)
 
 	httpServer := newHttpServer(l, detectorService, groupsService, metricsService, lapConfigService, maskService, imagesRepo, cfg.Http)
 
