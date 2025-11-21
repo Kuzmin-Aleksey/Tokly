@@ -45,9 +45,6 @@ func NewModel(modelPath string, cfg *ModelConfig) *Model {
 	if err := net.SetPreferableBackend(gocv.NetBackendOpenCV); err != nil {
 		log.Fatal(err)
 	}
-	if err := net.SetPreferableTarget(gocv.NetTargetCPU); err != nil {
-		log.Fatal(err)
-	}
 
 	return &Model{
 		net: &net,
