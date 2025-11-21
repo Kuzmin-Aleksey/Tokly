@@ -20,5 +20,6 @@ func (s *Server) InitRoutes(rtr *mux.Router) {
 
 	rtr.HandleFunc("/image/{group_id}/{image_uid}.jpeg", s.images.HandleImage).Methods(http.MethodGet)
 	rtr.HandleFunc("/image/{group_id}/{image_uid}_mask.png", s.images.HandleMask).Methods(http.MethodGet, http.MethodPost)
-	rtr.HandleFunc("/mask/{detection_id}.png", s.mask.GetMask).Methods(http.MethodGet)
+	rtr.HandleFunc("/mask/{detection_id}.png", s.mask.GetRect).Methods(http.MethodGet)
+	rtr.HandleFunc("/polygon/{image_uid}.png", s.mask.GetPolygon).Methods(http.MethodGet)
 }
