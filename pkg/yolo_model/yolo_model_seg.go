@@ -9,6 +9,7 @@ import (
 	"log"
 	"math"
 	"sort"
+	"sync"
 )
 
 type ModelSegConfig struct {
@@ -29,6 +30,7 @@ func ReadSegConfig(path string) (*ModelSegConfig, error) {
 type ModelSeg struct {
 	net *gocv.Net
 	cfg *ModelSegConfig
+	mu  sync.Mutex
 }
 
 func NewModelSeg(modelPath string, cfg *ModelSegConfig) *ModelSeg {
@@ -36,6 +38,11 @@ func NewModelSeg(modelPath string, cfg *ModelSegConfig) *ModelSeg {
 	if net.Empty() {
 		log.Fatal("failed to load ONNX-seg model from ", modelPath)
 	}
+
+	if err := net.SetPreferableBackend(gocv.NetBackendOpenCV); err != nil {
+		log.Fatal(err)
+	}
+
 	return &ModelSeg{
 		net: &net,
 		cfg: cfg,
@@ -43,6 +50,9 @@ func NewModelSeg(modelPath string, cfg *ModelSegConfig) *ModelSeg {
 }
 
 func (m *ModelSeg) DetectPolygons(img image.Image) ([][]image.Point, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	mat, err := imageToMat(img)
 	if err != nil {
 		return nil, fmt.Errorf("read image failed: %w", err)

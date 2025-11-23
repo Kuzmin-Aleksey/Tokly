@@ -6,6 +6,7 @@ import (
 	"gocv.io/x/gocv"
 	"image"
 	"log"
+	"sync"
 )
 
 type ModelConfig struct {
@@ -32,6 +33,7 @@ func ReadConfig(path string) (*ModelConfig, error) {
 type Model struct {
 	net *gocv.Net
 	cfg *ModelConfig
+	mu  sync.Mutex
 }
 
 func NewModel(modelPath string, cfg *ModelConfig) *Model {
@@ -58,6 +60,9 @@ type Detection struct {
 }
 
 func (m *Model) Detect(img image.Image) ([]Detection, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	mat, err := imageToMat(img)
 	if err != nil {
 		return nil, fmt.Errorf("read image failed: %w", err)

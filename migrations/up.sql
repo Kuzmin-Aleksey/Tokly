@@ -2,8 +2,8 @@ create table `groups`
 (
     id        int auto_increment
         primary key,
-    lap_id    int       not null,
-    create_at timestamp not null
+    lap_id    varchar(45) not null,
+    create_at timestamp   not null
 );
 
 create table detections

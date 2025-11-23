@@ -3,6 +3,3 @@ config/config.yaml
 logs
 *.jpeg
 *.png
-test
-main.go
-*.json

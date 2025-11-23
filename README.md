@@ -1,18 +1,39 @@
 # Tokly
-
-Мониторинг состояния виброгасителей, изоляторов и траверсов
+## МПИТ Окружной этап
+## Кейс: «Мониторинг состояния виброгасителей, изоляторов и траверсов»
 
 ### Requirement
- - OpenCV 4
+ - OpenCV
  - Mysql
  - YOLO onnx model
 
-### Add OpenCV pkgconfig to pach
-```sh
-set PATH = %PATH%;C:/opencv/build/install/x64/mingw/lib/pkgconfig/opencv4.pc
+
+### Build
+**Download dependency**
+```shell
+go mod dounload
 ```
 
+**Install OpnCV**
 
+<p>Windows:</p>
+
+```shell
+cd $GOPATH/src/gocv.io/x/gocv@v0.42.0
+win_build_opencv.cmd
+```
+
+<p>Linux:</p>
+
+```shell
+cd $GOPATH/src/gocv.io/x/gocv@v0.42.0
+make install
+```
+
+**Run**
+```shell
+go run cmd/detector/main.go
+```
 
 ### Example config/config.yaml
 ```yaml
